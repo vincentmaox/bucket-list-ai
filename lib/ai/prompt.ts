@@ -24,7 +24,10 @@ export const SYSTEM_PROMPT = `你是一位资深的人生体验设计师（Exper
 
 如果用户画像信息不全，用合理默认值推断，不要拒绝回答。`;
 
-export function buildUserPrompt(req: RecommendationRequest): string {
+export function buildUserPrompt(
+  req: RecommendationRequest,
+  meta?: { zodiac?: string; zodiacElement?: string; animal?: string }
+): string {
   const { profile, life, hints } = req;
   const gender = profile.gender === "female" ? "女" : profile.gender === "male" ? "男" : "未指定";
   const income = profile.annualIncome ? `¥${profile.annualIncome.toLocaleString("en-US")}` : "未提供";
@@ -34,11 +37,15 @@ export function buildUserPrompt(req: RecommendationRequest): string {
 【用户画像】
 - 年龄：${life.age} 岁（性别：${gender}）
 - MBTI：${profile.mbti ?? "未指定（请用 INTJ 默认推断）"}
+- 星座：${meta?.zodiac ?? "未指定"}${meta?.zodiacElement ? `（${meta.zodiacElement}象）` : ""}
+- 生肖：${meta?.animal ?? "未指定"}
 - 血型：${profile.bloodType ?? "未指定"} 型
 - 年收入：${income}
 - 所在国家：${profile.country ?? "CN"}
 - 剩余时间：${life.remainingWeeks.toLocaleString("en-US")} 周（约 ${life.remainingYears.toFixed(1)} 年）
 - 预期寿命：${life.lifeExpectancy} 岁
+
+**重要**：上面给出的星座/生肖是系统精确计算的，**直接使用不要重新推算**。
 
 ${hints?.preferCategories?.length ? `【偏好维度】\n${hints.preferCategories.join("、")}\n` : ""}
 ${hints?.avoidLocations?.length ? `【已去过/不想去】\n${hints.avoidLocations.join("、")}\n` : ""}
