@@ -1,26 +1,381 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-heading: var(--font-serif);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-amber: var(--amber);
+  --color-aurora: var(--aurora);
+  --color-starlight: var(--starlight);
+  --color-space-deep: var(--space-deep);
+  --color-space-void: var(--space-void);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Vision Pro 太空主题 — 默认深色 */
+:root {
+  /* 背景层 */
+  --space-void: oklch(0.13 0.025 260);
+  --space-deep: oklch(0.18 0.04 256);
+  --space-mid: oklch(0.24 0.04 256);
+
+  /* 强调色 */
+  --amber: oklch(0.82 0.16 71);
+  --aurora: oklch(0.91 0.15 172);
+  --starlight: oklch(0.96 0.01 240);
+
+  /* shadcn token 映射 */
+  --background: var(--space-void);
+  --foreground: var(--starlight);
+  --card: oklch(0.22 0.035 256 / 60%);
+  --card-foreground: var(--starlight);
+  --popover: oklch(0.22 0.035 256 / 90%);
+  --popover-foreground: var(--starlight);
+  --primary: var(--amber);
+  --primary-foreground: oklch(0.15 0.03 256);
+  --secondary: oklch(0.28 0.04 256);
+  --secondary-foreground: var(--starlight);
+  --muted: oklch(0.28 0.03 256 / 60%);
+  --muted-foreground: oklch(0.72 0.02 256);
+  --accent: var(--aurora);
+  --accent-foreground: oklch(0.15 0.03 256);
+  --destructive: oklch(0.65 0.22 25);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: var(--amber);
+  --chart-1: var(--amber);
+  --chart-2: var(--aurora);
+  --chart-3: oklch(0.7 0.15 300);
+  --chart-4: oklch(0.75 0.18 200);
+  --chart-5: oklch(0.65 0.2 30);
+  --radius: 0.75rem;
+  --sidebar: oklch(0.16 0.035 256 / 80%);
+  --sidebar-foreground: var(--starlight);
+  --sidebar-primary: var(--amber);
+  --sidebar-primary-foreground: oklch(0.15 0.03 256);
+  --sidebar-accent: oklch(0.28 0.04 256);
+  --sidebar-accent-foreground: var(--starlight);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: var(--amber);
+
+  /* 字体 */
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  --font-serif: ui-serif, "Songti SC", "STSong", "Source Han Serif SC",
+    "Noto Serif SC", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", "Menlo",
+    monospace;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans antialiased;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(ellipse at top, oklch(0.25 0.05 256 / 40%) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom right, oklch(0.3 0.08 300 / 25%) 0%, transparent 60%),
+      radial-gradient(ellipse at bottom left, oklch(0.28 0.06 180 / 20%) 0%, transparent 55%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  ::selection {
+    background: oklch(0.82 0.16 71 / 30%);
+    color: var(--starlight);
+  }
+  /* 自定义滚动条 */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: oklch(1 0 0 / 10%);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.82 0.16 71 / 40%);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ============ Vision Pro 工具类 ============ */
+@layer utilities {
+  /* 玻璃面板 — 核心视觉 */
+  .glass-panel {
+    background: linear-gradient(
+      135deg,
+      oklch(1 0 0 / 8%) 0%,
+      oklch(1 0 0 / 3%) 100%
+    );
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid oklch(1 0 0 / 12%);
+    box-shadow:
+      0 8px 32px oklch(0 0 0 / 37%),
+      inset 0 1px 0 oklch(1 0 0 / 8%),
+      inset 0 -1px 0 oklch(0 0 0 / 20%);
+  }
+  .glass-panel-strong {
+    background: linear-gradient(
+      135deg,
+      oklch(1 0 0 / 14%) 0%,
+      oklch(1 0 0 / 6%) 100%
+    );
+    backdrop-filter: blur(60px) saturate(200%);
+    -webkit-backdrop-filter: blur(60px) saturate(200%);
+    border: 1px solid oklch(1 0 0 / 18%);
+    box-shadow:
+      0 16px 48px oklch(0 0 0 / 45%),
+      inset 0 1px 0 oklch(1 0 0 / 12%);
+  }
+
+  /* 发光文字 */
+  .text-glow-amber {
+    text-shadow:
+      0 0 20px oklch(0.82 0.16 71 / 60%),
+      0 0 40px oklch(0.82 0.16 71 / 30%);
+  }
+  .text-glow-aurora {
+    text-shadow:
+      0 0 20px oklch(0.91 0.15 172 / 60%),
+      0 0 40px oklch(0.91 0.15 172 / 30%);
+  }
+  .text-glow-starlight {
+    text-shadow:
+      0 0 30px oklch(0.96 0.01 240 / 50%),
+      0 0 60px oklch(0.96 0.01 240 / 20%);
+  }
+
+  /* 边框光晕 */
+  .border-glow-amber {
+    box-shadow:
+      0 0 0 1px oklch(0.82 0.16 71 / 40%),
+      0 0 24px oklch(0.82 0.16 71 / 30%);
+  }
+  .border-glow-aurora {
+    box-shadow:
+      0 0 0 1px oklch(0.91 0.15 172 / 40%),
+      0 0 24px oklch(0.91 0.15 172 / 30%);
+  }
+
+  /* 极光渐变 */
+  .gradient-aurora {
+    background: linear-gradient(
+      135deg,
+      oklch(0.82 0.16 71) 0%,
+      oklch(0.91 0.15 172) 50%,
+      oklch(0.7 0.15 300) 100%
+    );
+  }
+  .gradient-deep-space {
+    background: linear-gradient(
+      180deg,
+      oklch(0.13 0.025 260) 0%,
+      oklch(0.18 0.04 256) 50%,
+      oklch(0.13 0.025 260) 100%
+    );
+  }
+
+  /* 星空背景 */
+  .starfield {
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, oklch(1 0 0 / 80%), transparent),
+      radial-gradient(1px 1px at 60% 70%, oklch(1 0 0 / 60%), transparent),
+      radial-gradient(1px 1px at 80% 10%, oklch(1 0 0 / 90%), transparent),
+      radial-gradient(1px 1px at 30% 80%, oklch(1 0 0 / 70%), transparent),
+      radial-gradient(1px 1px at 90% 50%, oklch(1 0 0 / 50%), transparent),
+      radial-gradient(2px 2px at 50% 50%, oklch(0.91 0.15 172 / 60%), transparent),
+      radial-gradient(1px 1px at 10% 60%, oklch(0.82 0.16 71 / 70%), transparent);
+    background-size: 200% 200%;
+    background-repeat: repeat;
+  }
 }
+
+/* ============ 动画 ============ */
+@keyframes starlight-drift {
+  0% { transform: translate3d(0, 0, 0); opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { transform: translate3d(-100px, -50px, 0); opacity: 0.6; }
+}
+
+@keyframes aurora-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1) rotate(0deg); }
+  50% { opacity: 0.8; transform: scale(1.1) rotate(2deg); }
+}
+
+@keyframes glow-breathe {
+  0%, 100% {
+    box-shadow:
+      0 0 20px oklch(0.82 0.16 71 / 30%),
+      0 0 40px oklch(0.82 0.16 71 / 15%);
+  }
+  50% {
+    box-shadow:
+      0 0 30px oklch(0.82 0.16 71 / 50%),
+      0 0 60px oklch(0.82 0.16 71 / 25%);
+  }
+}
+
+@keyframes float-up {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes countdown-tick {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.animate-starlight-drift { animation: starlight-drift 60s linear infinite; }
+.animate-aurora-pulse { animation: aurora-pulse 8s ease-in-out infinite; }
+.animate-glow-breathe { animation: glow-breathe 4s ease-in-out infinite; }
+.animate-float-up { animation: float-up 0.6s ease-out forwards; }
+.animate-countdown-tick { animation: countdown-tick 1s ease-in-out; }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    oklch(1 0 0 / 4%) 0%,
+    oklch(1 0 0 / 10%) 50%,
+    oklch(1 0 0 / 4%) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* 自定义 range slider */
+input[type="range"].slider-amber {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: linear-gradient(90deg, oklch(0.82 0.16 71 / 0.4), oklch(0.91 0.15 172 / 0.4));
+  border-radius: 999px;
+  outline: none;
+}
+
+input[type="range"].slider-amber::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: oklch(0.82 0.16 71);
+  border: 2px solid oklch(0.15 0.03 256);
+  box-shadow: 0 0 12px oklch(0.82 0.16 71 / 0.6), 0 2px 8px rgba(0,0,0,0.4);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+input[type="range"].slider-amber::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+input[type="range"].slider-amber::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: oklch(0.82 0.16 71);
+  border: 2px solid oklch(0.15 0.03 256);
+  box-shadow: 0 0 12px oklch(0.82 0.16 71 / 0.6);
+  cursor: pointer;
+}
+
+/* 美化 select 下拉 */
+select.glass-select {
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23FFB547' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+select.glass-select option {
+  background: oklch(0.18 0.04 256);
+  color: oklch(0.96 0.01 240);
+}
+
+/* 进度条渐变（作用到 shadcn Progress 的 Indicator 子元素） */
+@layer utilities {
+  .progress-aurora [data-slot="progress-indicator"] {
+    background: linear-gradient(
+      90deg,
+      oklch(0.82 0.16 71) 0%,
+      oklch(0.91 0.15 172) 50%,
+      oklch(0.7 0.15 300) 100%
+    ) !important;
+  }
+}
+
+@keyframes scan-line {
+  0% { top: -2%; opacity: 0; }
+  8% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { top: 102%; opacity: 0; }
+}
+
+@keyframes node-breathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.6; }
+}
+
+@keyframes dash-flow {
+  to { stroke-dashoffset: -20; }
+}
+
+.animate-scan-line { animation: scan-line 9s linear infinite; }
+.animate-node-breathe { animation: node-breathe 3s ease-in-out infinite; }
+.animate-dash-flow { animation: dash-flow 1.5s linear infinite; }

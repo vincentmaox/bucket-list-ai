@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# playwright 临时截图（视觉验证用，不提交）
+*.png
+homepage-*.png
+page-*.png
+.playwright-mcp/
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
