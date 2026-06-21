@@ -51,3 +51,7 @@ page-*.png
 .vscode/
 .idea/
 *.swp
+
+# Tauri Rust 编译产物（几百 MB，不提交）
+src-tauri/target/
+src-tauri/gen/
