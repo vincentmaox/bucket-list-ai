@@ -3,7 +3,7 @@
 > 按天记录。未来冷启动看这一个文件就能追上进度。
 
 **项目启动**：2026-06-20
-**当前状态**：2026-06-21 · P0+P1 完成度 95%
+**当前状态**：2026-06-24 · P0+P1 完成度 95% · TRAE Work 单文件 DEMO 视觉升级中
 **目标**：TRAE AI 创造力大赛 2026（7/15 初赛 / 8/22 决赛）
 
 ---
@@ -190,6 +190,29 @@ INTJ + ¥40万 + 10 愿望：月可支配 ¥1万 / 总目标 ¥16万 / 全部达
 - 写 `docs/HANDBOOK.md`（开发手册）
 - git 首次完整 commit
 - 调用 save_conversation_turn.py 存档对话
+
+---
+
+## Day 15-17 · 2026-06-22 ~ 2026-06-24 · TRAE Work DEMO 视觉升级
+
+### 背景
+Day 14 后项目代码已就绪（P0 闭环）。老茅用 TRAE Work 把单文件 demo（`D:\01_Project\my-bucket-list\bucket-list-ai.html`）重新生成了一版，发现**视觉层次太简单**——缺主项目那种纵深感（参见 memory `project_demo_vs_main_gap.md`）。
+
+### 完成
+- **Day 15-16（06-22 / 06-23）**：项目静默。老茅处理线下事务（大赛报名 / AI key 申请等）。git 无 commit，jsonl 无对话记录。
+- **Day 17（06-24）**：
+  - `docs/TRAE_WORK_PROMPT.md` v1 → v2 大改（**+312 / -143 行**）
+    - 标题：从「参赛生成提示词」→「视觉层次优化指令 v2」
+    - 底层逻辑锁定四维补齐：**空间纵深 + 动画密度 + 信息层级 + 负空间淡出**
+  - 调 `frontend-design` skill 协助提示词结构设计
+  - 06-24 15:08 commit v1（`6edf861`）；v2 改动本次会话提交
+
+### 关键决策
+**为什么不直接在 Next.js 主项目里调视觉**：TRAE Work 生成的是单文件 HTML，用于初赛「创意产物」赛道，与 Next.js 主项目并行。两个产物定位不同——HTML 给评委即开即看（无 build 依赖），Next.js 给 8/22 路演现场（真实可交互）。
+
+### 工具链状态
+- **save_conversation_turn.py hook 未注册**：检查确认 `~/.claude/settings.json` 里 0 个 hook 引用本脚本。这意味着 Day 1 至今的对话**全靠手动归档**。conversation_log/ 只有 06-21 一天占位。
+- 本次会话已从 jsonl 手动提取 06-24 对话补到 `conversation_log/2026-06-24.md`。
 
 ---
 

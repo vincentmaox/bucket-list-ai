@@ -1,154 +1,323 @@
-# TRAE Work 参赛生成提示词
+# TRAE Work 视觉层次优化指令 v2
 
-> 把以下完整提示词复制粘贴到 https://work.trae.cn/ 的输入框，生成参赛 HTML 文件。
-> 生成后下载 HTML，双击打开测试，作为初赛提交的「创意产物」。
-
----
-
-## 提示词正文（复制下面所有内容）
-
-请生成一个单文件 HTML 网页应用 `bucket-list-ai.html`，双击即可在浏览器打开运行，无任何 build 依赖。这是一个 AI 驱动的人生遗愿清单引擎 DEMO，参加字节跳动 TRAE AI 创造力大赛 2026。
-
-### 项目定位
-让用户输入生日/血型/MBTI/收入/所在国家，应用基于剩余寿命（年龄 + 国家平均寿命 - 已活）+ 性格画像 + 资金约束，AI 生成 10 个个性化的人生体验清单（如「冰岛看极光」「学木工造马鞍椅」「京都禅修」），并展示在 3D 风格的地球上，配合资金账本算月供节奏。
-
-### 设计语言（必须严格遵守）
-- **Vision Pro 太空主题**，深邃高科技感，但有人文温度
-- 配色（CSS 变量）：
-  - `--space-void: #050A14`（最深背景）
-  - `--space-deep: #0A1628`（太空蓝主背景）
-  - `--amber: #FFB547`（琥珀：想去 / CTA / 数字）
-  - `--aurora: #7FFFD4`（极光绿：已完成 / AI 标识 / 坐标）
-  - `--starlight: #F5F7FA`（柔和白：正文）
-- 字体：英文用系统 sans-serif，中文 PingFang SC / Microsoft YaHei，数字用 monospace，标题用衬线 serif
-- 玻璃质感：`backdrop-filter: blur(40px) saturate(180%)` + 半透明白 + 1px 内发光边
-- 禁止：赛博紫、霓虹粉、Tailwind 默认 zinc、廉价 AI 通用味
-- 背景：黑色 + 多层 radial-gradient 极光辉光 + 极淡星点
-
-### 页面结构（单页应用，JS 切换 section）
-
-#### Section 1: Hero 首屏「时间坐标」
-- 双语标题：`COORDINATES OF` / `你的时间坐标`
-- 中央巨型 monospace 数字 `2,011`（默认 demo 值），带琥珀色光晕 `text-shadow: 0 0 30px rgba(255,181,71,0.5)`
-- 周围 4 个发光节点（用 absolute 定位），不对称分布：
-  - 左上：INTJ · 人格
-  - 右上：摩羯座 · 土象
-  - 左下：🐴 马 · 生肖
-  - 右下：A 型血
-- 4 节点用 SVG 虚线连到中央数字，虚线带流动动画
-- 角落坐标文字（小字 monospace）：`N 39°54' E 116°23'` / `T+0:00:00 [REC]` / `SIG·LOCK 42.7Hz` / `v0.1.0-alpha`
-- 顶部缓慢扫描线动画（横向流光，9 秒周期）
-- 元数据行：`AT 🇨🇳 中国 · 36岁 · 75岁预期 · 51% 可活`
-- CTA：橙色渐变按钮「开启我的人生清单」+ 副按钮「看看世界」
-
-#### Section 2: 5 步引导问卷
-- 顶部进度条（1/5 → 5/5）
-- 5 步：
-  1. 出生日期 + 性别（input date + 两个按钮）
-  2. 血型（A/B/O/AB 四个按钮）+ MBTI（16 个小卡片，3 列手机 / 4 列桌面 grid）
-  3. 年收入（数字输入 + 快捷选项 10万/20万/40万/80万/150万）
-  4. 国家（grid 选 28 个常用国家，含国旗 emoji + 平均寿命）
-  5. 结果展示：剩余周数 + 已度过百分比 + 性格 badges
-- 每步切换有左右滑动动画（CSS transition transform）
-- 填完生日时实时显示星座徽章（摩羯/水瓶/双鱼/白羊/金牛/双子/巨蟹/狮子/处女/天秤/天蝎/射手）+ 生肖徽章（🐭鼠/🐮牛/🐯虎/🐰兔/🐲龙/🐍蛇/🐴马/🐑羊/🐵猴/🐔鸡/🐶狗/🐷猪）
-
-#### Section 3: AI 推荐清单（10 张卡片）
-- 顶部：summary 文字「基于 INTJ + 摩羯座 + 生肖马 + A 型血，老赫为你设计了 10 个能在 38 年内实现的人生体验」
-- Badge：`AI 推荐 · deepseek-chat`
-- 10 张玻璃卡片 grid（2 列桌面 / 1 列手机），每张含：
-  - 顶部分类 badge（旅行/体验/学习/关系/创造/健康/冒险/灵性/事业）
-  - 右上契合度数字（97/94/92/90/88/85/82/78/75/72），高分带光晕
-  - 标题（衬线字体）：
-    1. 在冰岛极光下完成一本哲学手稿
-    2. 在瑞士少女峰徒步并完成钢结构摄影集
-    3. 用一年周末系统学习木工并造一把马鞍椅
-    4. 独自徒步库拉岗日并完成高分辨率地形测绘
-    5. 在京都禅寺完成七日止语冥想修习
-    6. 在挪威布道石上独自看日出
-    7. 用三个月时间整理父亲的一千张老照片
-    8. 完成一次跨西伯利亚铁路全程旅行
-    9. 学一门古典乐器到能演奏一首完整曲子
-    10. 给十年后的自己写一封长信并封存
-  - 描述（30-50 字画面感）
-  - 引用性格的 reason（如「INTJ 的内向直觉需要孤独环境催化；摩羯座的耐心与 A 型血的条理性能支撑长期创作」）
-  - 预算（如 `¥18,000-28,000`）+ 时长（如 `8-10 天`）+ 时间窗口（如 `11 月-3 月极夜季`）
-  - 「在地球上看看」按钮（跳到 Section 4 地球）
-
-#### Section 4: 3D 风格世界地图（简化版）
-- 用 CSS 实现一个**伪 3D 旋转地球**：
-  - 圆形 div，渐变填充（地球蓝绿色）
-  - 内部用 SVG 画几条经纬线 + 几个发光圆点（想去的地方 = 琥珀色，已完成 = 极光绿）
-  - 整体 `animation: spin 60s linear infinite` 缓慢旋转
-- 8 个测试点位（带名字 + 类别）：
-  - 🟡 冰岛 · 维克黑沙滩（极光）
-  - 🟡 摩洛哥 · 梅尔祖卡沙漠（星空）
-  - 🟡 瑞士 · 少女峰（徒步）
-  - 🟡 日本 · 京都（禅修）
-  - 🟡 西藏 · 库拉岗日（徒步测绘）
-  - 🟡 挪威 · 布道石（日出）
-  - 🟢 北京（已抵达）
-  - 🟢 京都（已抵达）
-- 点位 hover 弹出玻璃 tooltip 显示详情
-- 顶部统计：想去 6 / 已完成 2
-
-#### Section 5: 资金账本
-- 顶部汇总卡：
-  - 总进度环（0% 起步，可拖动 slider 改变已攒金额看进度变化）
-  - 4 个统计：月可支配 ¥1万 / 总目标 ¥16万 / 剩余 ¥16万 / 全部达成 16 月
-  - 可支配比例 slider（5%-80%，自定义琥珀色 thumb）
-- 每个愿望的进度条卡片：进度条用 amber→aurora→purple 三色渐变
-- 标记已攒输入框（输入金额，进度条实时更新）
-
-#### Section 6: 人生记录
-- 顶部上传按钮：选照片 / 写文字（两个 tab）
-- 瀑布流展示已上传的记录（用 CSS columns 实现 masonry）
-- 每张照片鼠标 hover 时有视差效果（perspective + rotateX/Y）
-- 测试数据：3 张占位图（用 picsum.photos）+ 2 段文字
-
-### 交互流程
-1. 用户进入 → 看到首屏「时间坐标」Hero
-2. 点 CTA → 进入 5 步引导
-3. 填完 → 自动跳回首屏，显示真实剩余周数 + 性格画像节点
-4. 滚到第二屏 → 看 10 条 AI 推荐
-5. 点任意卡片「在地球上看看」→ 跳到地球，地球自动旋转到该位置
-6. 切到账本 → 看攒钱节奏
-7. 切到记录 → 上传照片/文字
-
-### 视觉锚点（评委 30 秒必须记住的画面）
-- 中央巨型琥珀色数字 + 4 节点连线的「时间坐标星图」
-- 角落坐标文字（北京经纬度 / T+0:00:00 [REC]）让画面有「指挥中心」叙事感
-- 扫描线缓慢扫过整个 Hero
-
-### 技术要求（硬约束）
-- **单个 HTML 文件**，所有 CSS/JS 内联，双击打开即可运行
-- 用 Tailwind CSS CDN：`<script src="https://cdn.tailwindcss.com"></script>`
-- 用 Google Fonts CDN 加载衬线字体（Noto Serif SC）
-- 数据全部 mock 在 JS 里（用户输入只存内存，刷新清空）
-- 所有动画用 CSS keyframes，不引入动画库
-- 不调外部 AI API（mock 数据足够展示创意）
-- 移动端响应式（手机/平板/桌面）
-- 整个文件不超过 3000 行，加载时间 < 2 秒
-
-### 文案语气
-冷静叙事，不喊口号。关键数字（2,011 周 / 97 契合度 / 16 月）稍微停顿强调。
-终极标语：「数据不上传，人生不下注。」
+> 目标：将 `my-bucket-list.html` 的单文件 demo 首屏视觉冲击力，提升至接近 bucket-list-ai 主项目（Next.js + Tailwind v4 + framer-motion）的水平。
+>
+> 底层逻辑：**空间纵深 + 动画密度 + 信息层级 + 负空间淡出** 四维度补齐。
 
 ---
 
-## 用法
+## 先决条件（执行本指令前必读）
 
-1. 打开 https://work.trae.cn/
-2. 把上面「提示词正文」整段复制粘贴到输入框
-3. 点生成，等 TRAE Work 输出 HTML
-4. 下载 HTML 文件
-5. 双击打开测试（Chrome / Edge / Safari）
-6. 截图 8 张作为参赛素材（按 docs/DEMO_SCRIPT.md 的分镜）
-7. 上传到 TRAE 社区报名帖作为「创意产物」
+1. 文件保持单文件 HTML，所有 CSS/JS 内联，不引入任何动画库，不引入 build 工具。
+2. 配色严格沿用现有 5 个 CSS 变量（`--space-void` / `--space-deep` / `--amber` / `--aurora` / `--starlight`），禁止新增赛博紫/霓虹粉。
+3. 每条优化都给了可直接粘贴的 CSS/JS 代码，不要省略任何细节。
 
-## 如果 TRAE Work 单次生成不全
+---
 
-分两次生成：
-- 第一次：首屏 + onboarding（Section 1-2）
-- 第二次：清单 + 地图 + 账本 + 记录（Section 3-6）
+## 优化 1：添加全屏坐标网格背景（P0 · 最重要）
 
-然后手动合并 HTML。或者告诉 TRAE Work「继续生成 Section 3-6」。
+**问题**：当前背景只有几个 radial-gradient 光斑，没有网格层，首屏像"网页"而非"太空控制台"。
+
+**做法**：在现有背景之上新增 SVG 网格层，铺满全屏，中心明亮、边缘用 radialGradient 隐入黑暗。
+
+```html
+<!-- 替换 body 里现有的 bg-cosmos + bg-stars 为以下三层 -->
+<div class="bg-grid">
+  <svg preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <pattern id="coord-grid" width="80" height="80" patternUnits="userSpaceOnUse">
+        <path d="M 80 0 L 0 0 0 80" fill="none" stroke="rgba(127,255,212,0.06)" stroke-width="0.5"/>
+        <circle cx="0" cy="0" r="1" fill="rgba(255,181,71,0.35)"/>
+      </pattern>
+      <radialGradient id="grid-fade" cx="50%" cy="50%" r="60%">
+        <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+        <stop offset="60%" stop-color="#000" stop-opacity="0.4"/>
+        <stop offset="100%" stop-color="#000" stop-opacity="0.85"/>
+      </radialGradient>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#coord-grid)"/>
+    <rect width="100%" height="100%" fill="url(#grid-fade)"/>
+  </svg>
+</div>
+<div class="bg-stars"></div>
+```
+
+```css
+.bg-grid {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 900px 600px at 50% 50%, rgba(255,181,71,0.08), transparent 60%),
+    linear-gradient(180deg, var(--space-void) 0%, var(--space-deep) 50%, var(--space-void) 100%);
+}
+.bg-grid svg { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.55; }
+```
+
+**效果**：首屏立刻有了"太空控制台"的三层纵深（网格背景 → 星图中景 → 文字前景）。
+
+---
+
+## 优化 2：星图放大 + 节点改为 SVG 圆点 + 呼吸动画（P0）
+
+**问题**：星图固定 640px 正方形，太小。4 个节点是 div 方块，不是"星点"，没有呼吸感。
+
+**做法**：
+
+1. 星图容器改为 `aspect-ratio: 5/3` + `max-width: 960px`，横向拉伸。
+2. 删除 4 个 `.node` div，改用 SVG 画连线 + 圆点。
+3. 给节点加 `node-breathe` 动画（半径缩放）。
+
+```css
+.star-map {
+  position: relative; width: 100%; max-width: 960px;
+  aspect-ratio: 5/3; margin: 0 auto;
+}
+
+@keyframes node-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.6); }
+}
+.node-breathe {
+  transform-origin: center;
+  animation: node-breathe 3s ease-in-out infinite;
+}
+
+@keyframes conn-flow {
+  to { stroke-dashoffset: -20; }
+}
+.conn-flow {
+  animation: conn-flow 1.5s linear infinite;
+}
+```
+
+```html
+<!-- 在 .star-map 内部，替换现有 SVG 和所有 .node div 为： -->
+<svg viewBox="0 0 500 300" preserveAspectRatio="none"
+     style="position:absolute;inset:0;width:100%;height:100%">
+  <defs>
+    <radialGradient id="center-aura" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#FFB547" stop-opacity="0.3"/>
+      <stop offset="40%" stop-color="#FFB547" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#FFB547" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 中央光晕 -->
+  <ellipse cx="250" cy="150" rx="180" ry="100" fill="url(#center-aura)"/>
+
+  <!-- 连线：4 条静态虚线 + 4 条流动虚线 -->
+  <!-- 左上 amber 节点 (20%, 22%) -> 中心 -->
+  <line x1="100" y1="66" x2="250" y2="150" stroke="#FFB547" stroke-width="0.6" stroke-dasharray="3 4" opacity="0.5"/>
+  <line x1="100" y1="66" x2="250" y2="150" stroke="#FFB547" stroke-width="0.6" stroke-dasharray="2 18" class="conn-flow" opacity="0.8"/>
+
+  <!-- 右上 aurora 节点 (88%, 22%) -> 中心 -->
+  <line x1="440" y1="66" x2="250" y2="150" stroke="#7FFFD4" stroke-width="0.6" stroke-dasharray="3 4" opacity="0.5"/>
+  <line x1="440" y1="66" x2="250" y2="150" stroke="#7FFFD4" stroke-width="0.6" stroke-dasharray="2 18" class="conn-flow" opacity="0.8"/>
+
+  <!-- 左下 aurora 节点 (12%, 78%) -> 中心 -->
+  <line x1="60" y1="234" x2="250" y2="150" stroke="#7FFFD4" stroke-width="0.6" stroke-dasharray="3 4" opacity="0.5"/>
+  <line x1="60" y1="234" x2="250" y2="150" stroke="#7FFFD4" stroke-width="0.6" stroke-dasharray="2 18" class="conn-flow" opacity="0.8"/>
+
+  <!-- 右下 amber 节点 (88%, 78%) -> 中心 -->
+  <line x1="440" y1="234" x2="250" y2="150" stroke="#FFB547" stroke-width="0.6" stroke-dasharray="3 4" opacity="0.5"/>
+  <line x1="440" y1="234" x2="250" y2="150" stroke="#FFB547" stroke-width="0.6" stroke-dasharray="2 18" class="conn-flow" opacity="0.8"/>
+
+  <!-- 节点圆点 -->
+  <!-- 左上 amber -->
+  <circle cx="100" cy="66" r="9" fill="#FFB547" opacity="0.15"/>
+  <circle cx="100" cy="66" r="3.5" fill="#FFB547"/>
+  <circle cx="100" cy="66" r="3.5" fill="none" stroke="#FFB547" stroke-width="0.5" class="node-breathe"/>
+
+  <!-- 右上 aurora -->
+  <circle cx="440" cy="66" r="9" fill="#7FFFD4" opacity="0.15"/>
+  <circle cx="440" cy="66" r="3.5" fill="#7FFFD4"/>
+  <circle cx="440" cy="66" r="3.5" fill="none" stroke="#7FFFD4" stroke-width="0.5" class="node-breathe"/>
+
+  <!-- 左下 aurora -->
+  <circle cx="60" cy="234" r="9" fill="#7FFFD4" opacity="0.15"/>
+  <circle cx="60" cy="234" r="3.5" fill="#7FFFD4"/>
+  <circle cx="60" cy="234" r="3.5" fill="none" stroke="#7FFFD4" stroke-width="0.5" class="node-breathe"/>
+
+  <!-- 右下 amber -->
+  <circle cx="440" cy="234" r="9" fill="#FFB547" opacity="0.15"/>
+  <circle cx="440" cy="234" r="3.5" fill="#FFB547"/>
+  <circle cx="440" cy="234" r="3.5" fill="none" stroke="#FFB547" stroke-width="0.5" class="node-breathe"/>
+</svg>
+
+<!-- 节点标签（HTML 覆盖在 SVG 上） -->
+<div style="position:absolute;left:20%;top:22%;transform:translate(20px,-50%)">
+  <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--amber);white-space:nowrap">INTJ</div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px">人格</div>
+</div>
+<div style="position:absolute;left:88%;top:22%;transform:translate(calc(-100% - 20px),-50%)">
+  <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--aurora);white-space:nowrap">摩羯座</div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px">土象</div>
+</div>
+<div style="position:absolute;left:12%;top:78%;transform:translate(20px,-50%)">
+  <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--aurora);white-space:nowrap">🐴 马</div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px">生肖</div>
+</div>
+<div style="position:absolute;left:88%;top:78%;transform:translate(calc(-100% - 20px),-50%)">
+  <div style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--amber);white-space:nowrap">A 型</div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px">血型</div>
+</div>
+```
+
+**注意**：节点坐标是 `viewBox="0 0 500 300"` 内的绝对像素，换算关系：
+- x% → x/100 * 500, y% → y/100 * 300
+- 中心 = (250, 150)
+
+---
+
+## 优化 3：扫描线改为细线 + 光晕尾迹（P0）
+
+**问题**：当前 `.scanline` 是 120px 高的大色块带背景渐变，像"擦除动画"，不像科幻扫描线。
+
+**做法**：改成 1px 细线 + 12px 光晕尾迹，纯 CSS。
+
+```css
+.scanline {
+  position: absolute; top: 0; left: 0; right: 0;
+  pointer-events: none; z-index: 3;
+  animation: scan 9s linear infinite;
+}
+.scanline::before {
+  content: "";
+  position: absolute; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,181,71,0.5), transparent);
+}
+.scanline::after {
+  content: "";
+  position: absolute; left: 0; right: 0; height: 12px;
+  background: linear-gradient(180deg, rgba(255,181,71,0.10), transparent);
+}
+
+@keyframes scan {
+  0%   { transform: translateY(-12px); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+```
+
+---
+
+## 优化 4：中央数字加多层光晕 + 呼吸动画（P1）
+
+**问题**：当前只有一层 `text-shadow: 0 0 30px`，光晕太薄，没有"发光体"的体积感。
+
+**做法**：4 层递进光晕 + 4s 呼吸周期。
+
+```css
+.center-num {
+  /* 保持现有定位代码不变，只替换 text-shadow */
+  text-shadow:
+    0 0 20px rgba(255,181,71,0.6),
+    0 0 50px rgba(255,181,71,0.3),
+    0 0 100px rgba(255,181,71,0.15),
+    0 0 200px rgba(255,181,71,0.05);
+  animation: num-glow 4s ease-in-out infinite;
+}
+
+@keyframes num-glow {
+  0%, 100% {
+    text-shadow:
+      0 0 20px rgba(255,181,71,0.6),
+      0 0 50px rgba(255,181,71,0.3),
+      0 0 100px rgba(255,181,71,0.15),
+      0 0 200px rgba(255,181,71,0.05);
+  }
+  50% {
+    text-shadow:
+      0 0 30px rgba(255,181,71,0.8),
+      0 0 70px rgba(255,181,71,0.4),
+      0 0 140px rgba(255,181,71,0.2),
+      0 0 280px rgba(255,181,71,0.08);
+  }
+}
+```
+
+---
+
+## 优化 5：CTA 改为文字链接风格（P1）
+
+**问题**：实心橙渐变按钮像"营销落地页"，破坏太空控制台的克制感。
+
+**做法**：改成文字 + 下划线动效，参考主项目 `page.tsx:222-234`。
+
+```html
+<div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+  <a href="#guide" class="cta-group" style="text-decoration:none;display:inline-flex;flex-direction:column;align-items:center">
+    <span style="font-family:'JetBrains Mono',monospace;font-size:16px;color:var(--amber);letter-spacing:0.1em">
+      → 开启我的人生清单
+    </span>
+    <span class="cta-underline" style="display:block;height:1px;background:rgba(255,181,71,0.4);width:96px;margin-top:4px;transition:all .25s"></span>
+    <span style="font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:6px;letter-spacing:0.05em">
+      1 分钟 · 5 个问题
+    </span>
+  </a>
+  <a href="#earth" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted);letter-spacing:0.05em;text-decoration:none;transition:color .25s" onmouseover="this.style.color='var(--aurora)'" onmouseout="this.style.color='var(--muted)'">
+    看看世界 →
+  </a>
+</div>
+
+<style>
+.cta-group:hover .cta-underline {
+  width: 100% !important;
+  background: var(--amber) !important;
+}
+</style>
+```
+
+---
+
+## 优化 6：角落坐标文字换行（P2）
+
+**问题**：单行太宽，像标签而非终端输出。
+
+**做法**：`
+` 换行，配合 `white-space: pre-line`。
+
+```html
+<div class="corner-coord" style="top:70px;left:24px;white-space:pre-line">N 39°54'
+E 116°23'</div>
+<div class="corner-coord" style="top:70px;right:24px;white-space:pre-line;text-align:right">T+0:00:00
+[REC]</div>
+<div class="corner-coord" style="bottom:24px;left:24px;white-space:pre-line">SIG · LOCK
+42.7Hz</div>
+<div class="corner-coord" style="bottom:24px;right:24px;white-space:pre-line;text-align:right">v0.1.0-alpha
+void.architect</div>
+```
+
+---
+
+## 执行优先级（如果一次改不完）
+
+| 批次 | 包含优化 | 视觉提升占比 |
+|---|---|---|
+| 第一批 | 1（网格背景）+ 2（SVG 星图节点）+ 3（扫描线细线）| ~80% |
+| 第二批 | 4（数字光晕）+ 5（CTA 文字链接）| ~15% |
+| 第三批 | 6（角落换行）+ 微调 | ~5% |
+
+---
+
+## 验收标准
+
+- [ ] 首屏网格铺满全屏，中心明亮、边缘隐入黑暗
+- [ ] 星图横向 5:3 比例，节点是 SVG 圆点且有呼吸动画
+- [ ] 扫描线是 1px 细线 + 光晕，不是大块背景
+- [ ] 中央数字有 4 层递进光晕 + 呼吸
+- [ ] CTA 是文字链接风格，无实心按钮
+- [ ] 所有改动保持单文件 HTML，无外部依赖
+- [ ] 加载时间 < 2 秒，无控制台报错
+
+---
+
+## 附录：原始提示词（v1）
+
+完整原始生成提示词见 `.trae/specs/build-bucket-list-app/spec.md`，包含所有 Section 1-6 的功能要求。
+本文件（v2）仅覆盖首屏视觉层次的增量优化指令。
+
+---
+
+*生成时间：2026-06-24*
+*对比基准：bucket-list-ai 主项目 `app/page.tsx` + `components/brand/constellation-map.tsx` + `components/brand/coordinate-grid.tsx`*

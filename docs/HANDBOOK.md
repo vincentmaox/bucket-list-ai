@@ -195,7 +195,55 @@ npx shadcn@latest add <component-name>
 - [ ] 跑 `npm run dev` 确认项目能起
 - [ ] 跟老茅确认今天主攻方向（AskUserQuestion）
 
-## 十一、协作 checklist（每次会话结束）
+## 十一、对话存档系统
+
+### 现状（2026-06-24）
+- `~/.claude/scripts/save_conversation_turn.py` 存在，但**未注册**到 `~/.claude/settings.json` 的 hooks
+- 当前所有对话归档靠老赫**从 jsonl 手动提取**（`~/.claude/projects/.../*.jsonl` → `conversation_log/<date>.md`）
+- 一旦 hook 注册，会自动落到 `conversation_log/<date>.md`，无需手动
+
+### Hook 注册（待老茅执行）
+脚本支持 4 个事件，需要全部注册到 `~/.claude/settings.json`（含密文件，用 `update-config` skill 操作或 Edit 非密锚点）：
+
+| Event | 行为 |
+|---|---|
+| `UserPromptSubmit` | 老茅 prompt 一提交就 append，标 `[PENDING:sid]` |
+| `Stop` | 老赫回复完成，清 PENDING + 追加回复 |
+| `PreCompact` | 压缩前快照 jsonl 到 `conversation_log/_snapshots/` |
+| `SessionStart` | 注入近 5 轮对话回上下文 |
+
+参考片段（路径用绝对路径，含 `\` 需转义）：
+```jsonc
+{
+  "hooks": {
+    "UserPromptSubmit": [{"matcher": "*", "hooks": [{"type": "command", "command": "python C:\\Users\\maoxu\\.claude\\scripts\\save_conversation_turn.py"}]}],
+    "Stop":             [{"matcher": "*", "hooks": [{"type": "command", "command": "python C:\\Users\\maoxu\\.claude\\scripts\\save_conversation_turn.py"}]}],
+    "PreCompact":       [{"matcher": "*", "hooks": [{"type": "command", "command": "python C:\\Users\\maoxu\\.claude\\scripts\\save_conversation_turn.py"}]}],
+    "SessionStart":     [{"matcher": "*", "hooks": [{"type": "command", "command": "python C:\\Users\\maoxu\\.claude\\scripts\\save_conversation_turn.py"}]}]
+  }
+}
+```
+
+### 手动归档 fallback
+未注册期间，老赫用本会话同款 python 脚本从 jsonl 提取：
+```bash
+python -c "
+import json
+from pathlib import Path
+JSONL_DIR = Path(r'C:/Users/maoxu/.claude/projects/D--ClaudeCodeProjects-bucket-list-ai')
+# ... 遍历 jsonl，提取 type=user/assistant 的 text，写入 conversation_log/<date>.md
+"
+```
+
+### 主体标签约定
+- **老茅:**（不用 `**User:**`）
+- **老赫:**（不用 `**Assistant:**`）
+- 每轮 `## HH:MM:SS · **label**` 头
+- 截断：老茅 4000 字 / 老赫 8000 字（脚本默认）
+
+---
+
+## 十二、协作 checklist（每次会话结束）
 
 - [ ] 更新 `docs/PROJECT_LOG.md`（加 Day N 条目）
 - [ ] 有重大决策/踩坑 → 更新 memory 系统
