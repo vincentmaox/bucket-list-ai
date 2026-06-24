@@ -197,10 +197,11 @@ npx shadcn@latest add <component-name>
 
 ## 十一、对话存档系统
 
-### 现状（2026-06-24）
-- `~/.claude/scripts/save_conversation_turn.py` 存在，但**未注册**到 `~/.claude/settings.json` 的 hooks
-- 当前所有对话归档靠老赫**从 jsonl 手动提取**（`~/.claude/projects/.../*.jsonl` → `conversation_log/<date>.md`）
-- 一旦 hook 注册，会自动落到 `conversation_log/<date>.md`，无需手动
+### 现状（2026-06-24 · 已注册）
+- `~/.claude/scripts/save_conversation_turn.py` **已注册**到 `~/.claude/settings.json` 的 hooks（4 事件：UserPromptSubmit / Stop / PreCompact / SessionStart）
+- 备份：`~/.claude/settings.json.bak-20260624_234649`
+- 注册后**需要 `/hooks` 一次或重启** Claude Code 才生效（settings watcher 不主动监听 settings.json 改动）
+- 老茅首次新会话起，所有对话自动落到 `conversation_log/<date>.md`，无需手动
 
 ### Hook 注册（待老茅执行）
 脚本支持 4 个事件，需要全部注册到 `~/.claude/settings.json`（含密文件，用 `update-config` skill 操作或 Edit 非密锚点）：
