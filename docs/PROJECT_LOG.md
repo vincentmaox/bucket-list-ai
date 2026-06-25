@@ -3,7 +3,7 @@
 > 按天记录。未来冷启动看这一个文件就能追上进度。
 
 **项目启动**：2026-06-20
-**当前状态**：2026-06-24 · P0+P1 完成度 95% · TRAE Work 单文件 DEMO 视觉升级中
+**当前状态**：2026-06-25 · P0+P1 完成度 95% · Tauri dev 通 + Prompt 反套路优化完成
 **目标**：TRAE AI 创造力大赛 2026（7/15 初赛 / 8/22 决赛）
 
 ---
@@ -190,6 +190,33 @@ INTJ + ¥40万 + 10 愿望：月可支配 ¥1万 / 总目标 ¥16万 / 全部达
 - 写 `docs/HANDBOOK.md`（开发手册）
 - git 首次完整 commit
 - 调用 save_conversation_turn.py 存档对话
+
+---
+
+## Day 18 · 2026-06-25 · Tauri dev 通 + AI prompt 反套路优化
+
+### 完成
+- **Tauri dev 编译通过**（首次 2m35s，371 crates）+ Tauri 窗口启动（`target/debug/app.exe`）
+- **AI prompt 反套路优化**（`lib/ai/prompt.ts` SYSTEM_PROMPT 重写）：
+  - 加 12 条反套路硬约束（禁冰岛极光/京都禅修/撒哈拉/马尔代夫/马拉松/乐器/外语/书/跳伞/潜水/雪山/父母/孩子）
+  - 加「时间锚点」要求（summary 必须引用剩余周数）
+  - 加「中文质感」约束（动词+名词+数字，禁翻译腔）
+  - 加 MBTI 4 维**组合**解读（Ni/Te/Fi 等具体功能，非泛泛"适合 INTJ"）
+- **DeepSeek 真实联调实测**（INTJ + 1990-01-01 男 + A 型血 + ¥40万 + 2,011 周）：
+  - ✅ source=ai, model=deepseek-chat
+  - ✅ summary 引用 2,011 周 + 融合 Ni-Te/摩羯/马/A 型 4 维画像
+  - ✅ 反套路 0 命中（top 10：莫高窟临摹/浇筑混凝土桌/阿勒泰转场/半马精准配速/牯岭街旧书/腾冲热海/隆达速降/京都町屋/父亲口述史/骷髅海岸黑曜石）
+  - ✅ MBTI reason 引用具体功能（"INTJ 的 Ni 渴望...""Te 喜欢闭环"）
+  - ✅ 经纬度精确到 4 位、预算 3000-35000 CNY 合理分布、旅行只 1 条
+
+### 工具链问题（待修）
+- **对话存档 hook 行为不稳定**：注册后 UserPromptSubmit 工作（06-25.md 有 PENDING），但 Stop 似乎未触发（PENDING 未清）；同时 06-24.md 被莫名清空（已 git restore）。bug 待调查。
+- **fallback 措施**：手动 Python 提取 jsonl 仍可用作兜底归档。
+
+### Tauri build 限制（待处理）
+- `tauri.conf.json` 的 `frontendDist: "http://localhost:3000"` 只在 dev 模式工作
+- build 模式需要 `frontendDist` 指向静态文件目录（如 `../out`），但 Next.js 16 + API routes 默认不能 `output: 'export'`
+- 方案待定：(A) Next.js static export + 改 AI 客户端直调；(B) Tauri 内嵌 Next.js standalone server
 
 ---
 
