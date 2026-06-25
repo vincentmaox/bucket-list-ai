@@ -55,3 +55,6 @@ page-*.png
 # Tauri Rust 编译产物（几百 MB，不提交）
 src-tauri/target/
 src-tauri/gen/
+
+# 对话存档 hook 的内部快照（调试用，不提交）
+conversation_log/_snapshots/

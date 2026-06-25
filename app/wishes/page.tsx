@@ -12,6 +12,7 @@ import { WishCard } from "@/components/wishes/wish-card";
 import { useUserStore } from "@/lib/store/user-store";
 import { useWishesStore } from "@/lib/store/wishes-store";
 import { calcLife } from "@/lib/life-expectancy";
+import { fetchRecommendation as requestRecommendation } from "@/lib/ai/client";
 import type { RecommendationResponse } from "@/lib/types/wish";
 
 export default function WishesPage() {
@@ -42,28 +43,22 @@ export default function WishesPage() {
         profile.country,
         profile.gender
       );
-      const res = await fetch("/api/recommend", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          profile: {
-            birthDate: profile.birthDate,
-            gender: profile.gender,
-            bloodType: profile.bloodType,
-            mbti: profile.mbti,
-            annualIncome: profile.annualIncome,
-            country: profile.country,
-          },
-          life: {
-            age: life.age,
-            remainingWeeks: life.remainingWeeks,
-            remainingYears: life.remainingWeeks / 52.1775,
-            lifeExpectancy: life.lifeExpectancy,
-          },
-        }),
+      const json = await requestRecommendation({
+        profile: {
+          birthDate: profile.birthDate,
+          gender: profile.gender,
+          bloodType: profile.bloodType,
+          mbti: profile.mbti,
+          annualIncome: profile.annualIncome,
+          country: profile.country,
+        },
+        life: {
+          age: life.age,
+          remainingWeeks: life.remainingWeeks,
+          remainingYears: life.remainingWeeks / 52.1775,
+          lifeExpectancy: life.lifeExpectancy,
+        },
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = (await res.json()) as RecommendationResponse;
       setData(json);
       setWishesData(json);
     } catch (e) {

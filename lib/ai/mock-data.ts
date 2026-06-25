@@ -1,4 +1,4 @@
-import type { RecommendationResponse, RecommendationRequest } from "@/lib/types/wish";
+import type { RecommendationResponse, RecommendationRequest, Wish } from "@/lib/types/wish";
 
 export function getMockRecommendation(req: RecommendationRequest): RecommendationResponse {
   const mbti = req.profile.mbti ?? "INTJ";
@@ -10,7 +10,7 @@ export function getMockRecommendation(req: RecommendationRequest): Recommendatio
     summary: `基于你的 ${mbti} 性格与 ¥${income.toLocaleString("en-US")} 年收入约束，老赫为你设计了 10 个能在 ${req.life.remainingYears.toFixed(0)} 年内实现的人生体验。`,
     generatedAt: new Date().toISOString(),
     source: "mock",
-    wishes: [
+    wishes: ([
       {
         id: "wish-1",
         title: "在冰岛黑沙滩等一场天幕极光",
@@ -138,7 +138,7 @@ export function getMockRecommendation(req: RecommendationRequest): Recommendatio
         timeWindow: "春节 / 国庆（家族聚会时）",
         prerequisites: ["录音录像设备", "访谈大纲"],
       },
-    ].sort((a, b) => b.personalityFitScore - a.personalityFitScore),
+    ] as Wish[]).sort((a, b) => b.personalityFitScore - a.personalityFitScore),
   };
 
   return wishes;

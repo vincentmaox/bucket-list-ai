@@ -3,7 +3,7 @@
 > 按天记录。未来冷启动看这一个文件就能追上进度。
 
 **项目启动**：2026-06-20
-**当前状态**：2026-06-25 · P0+P1 完成度 95% · Tauri dev 通 + Prompt 反套路优化完成
+**当前状态**：2026-06-25 · P0+P1 完成度 98% · Tauri build 通（Windows .msi + .exe 首发首发）+ Prompt 反套路优化完成
 **目标**：TRAE AI 创造力大赛 2026（7/15 初赛 / 8/22 决赛）
 
 ---
@@ -217,6 +217,40 @@ INTJ + ¥40万 + 10 愿望：月可支配 ¥1万 / 总目标 ¥16万 / 全部达
 - `tauri.conf.json` 的 `frontendDist: "http://localhost:3000"` 只在 dev 模式工作
 - build 模式需要 `frontendDist` 指向静态文件目录（如 `../out`），但 Next.js 16 + API routes 默认不能 `output: 'export'`
 - 方案待定：(A) Next.js static export + 改 AI 客户端直调；(B) Tauri 内嵌 Next.js standalone server
+
+---
+
+## Day 19 · 2026-06-25 · 方案 A 落地 + Tauri 桌面安装包首发
+
+### 完成
+- **方案 A 全链路打通**（Static export + 客户端直调）：
+  - `next.config.ts` 加 `output: "export"` + `images.unoptimized` + `trailingSlash`
+  - 新建 `lib/ai/client.ts`（把原 `/api/recommend` 逻辑搬到客户端，读 `NEXT_PUBLIC_OPENAI_*` env）
+  - 改 `app/wishes/page.tsx` 用 `requestRecommendation` 客户端调用（本地 handler 重名→用 `as` 别名）
+  - 删 `/api/recommend` + `/api/depth`（static export 不支持 server route）
+  - `src-tauri/tauri.conf.json` `frontendDist` → `../out`（dev 仍用 `devUrl`）
+- **env 变量 rename**：`OPENAI_*` → `NEXT_PUBLIC_OPENAI_*`（3 个 key，Python 脚本进程内处理，未打印值）
+- **base-ui 适配**：`TooltipProvider` 的 `delayDuration={200}` → `delay={200}`（Radix 残留命名）
+- **AI SDK 适配**：`createOpenAI` 移除 `compatibility: "compatible"`（新版默认兼容）
+- **类型修正**：`mock-data.ts` 的 `wishes` 数组加 `as Wish[]`（修复 `category: string` 拓宽问题）
+- **Tauri build 成功**（5m20s 编译，371→359 crates）：
+  - `app.exe` 12 MB（raw）
+  - `bucket-list-ai_0.1.0_x64_en-US.msi` 5.7 MB（MSI 安装包）
+  - `bucket-list-ai_0.1.0_x64-setup.exe` 4.8 MB（NSIS 安装器）
+  - 全部产物在 `src-tauri/target/release/bundle/`
+
+### 关键决策
+**为什么选方案 A 不选方案 B**：
+- A 一次出 `.exe`，简单务实；B 需要内嵌 Next.js standalone server，Tauri sidecar 复杂度高
+- API key 暴露给桌面应用是可接受的（桌面应用本就是单机产物，key 跟二进制走）
+- 服务端 secret 这个概念对单机桌面应用没意义
+
+### 安全事件（已处理）
+Grep `.env.local` 用 `output_mode: content` 误读 DeepSeek key 进对话上下文。已建议用户轮换。后续 env 操作全部 Python 脚本进程内处理，只打印 key 名。
+
+### 工具链状态
+- **Stop hook 仍 disabled**（backup `settings.json.bak-20260625_134356-stop-disabled`），bug 待查
+- **UserPromptSubmit / PreCompact / SessionStart 三个 hook 正常工作**
 
 ---
 

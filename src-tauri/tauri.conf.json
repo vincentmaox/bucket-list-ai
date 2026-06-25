@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "identifier": "com.bucketlistai.app",
   "build": {
-    "frontendDist": "http://localhost:3000",
+    "frontendDist": "../out",
     "devUrl": "http://localhost:3000"
   },
   "app": {
