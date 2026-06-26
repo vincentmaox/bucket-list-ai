@@ -56,5 +56,8 @@ page-*.png
 src-tauri/target/
 src-tauri/gen/
 
+# portable 分发包（构建产物，不提交）
+/dist/
+
 # 对话存档 hook 的内部快照（调试用，不提交）
 conversation_log/_snapshots/

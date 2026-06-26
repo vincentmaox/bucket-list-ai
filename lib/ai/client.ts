@@ -7,6 +7,7 @@ import { SYSTEM_PROMPT, buildUserPrompt } from "@/lib/ai/prompt";
 import { getMockRecommendation } from "@/lib/ai/mock-data";
 import { getZodiacSign } from "@/lib/astro";
 import { getChineseZodiac } from "@/lib/zodiac";
+import { useAISettingsStore } from "@/lib/store/ai-settings-store";
 import type { RecommendationRequest, RecommendationResponse } from "@/lib/types/wish";
 
 const WISH_SCHEMA = z.object({
@@ -43,12 +44,36 @@ const RESPONSE_SCHEMA = z.object({
   wishes: z.array(WISH_SCHEMA).min(1).max(10),
 });
 
+export type EffectiveConfig = {
+  apiKey: string;
+  baseURL: string;
+  model: string;
+  source: "user" | "env" | "missing";
+};
+
+export function getEffectiveConfig(): EffectiveConfig {
+  const user = useAISettingsStore.getState().settings;
+  if (user.apiKey && user.baseURL) {
+    return {
+      apiKey: user.apiKey,
+      baseURL: user.baseURL,
+      model: user.model || "deepseek-chat",
+      source: "user",
+    };
+  }
+  const envKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY ?? "";
+  const envBase = process.env.NEXT_PUBLIC_OPENAI_BASE_URL ?? "";
+  const envModel = process.env.NEXT_PUBLIC_OPENAI_MODEL ?? "deepseek-chat";
+  if (envKey && envBase) {
+    return { apiKey: envKey, baseURL: envBase, model: envModel, source: "env" };
+  }
+  return { apiKey: "", baseURL: "", model: envModel, source: "missing" };
+}
+
 export async function fetchRecommendation(
   req: RecommendationRequest
 ): Promise<RecommendationResponse> {
-  const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
-  const baseURL = process.env.NEXT_PUBLIC_OPENAI_BASE_URL;
-  const modelName = process.env.NEXT_PUBLIC_OPENAI_MODEL ?? "deepseek-chat";
+  const { apiKey, baseURL, model } = getEffectiveConfig();
 
   if (!apiKey || !baseURL) {
     return getMockRecommendation(req);
@@ -66,13 +91,10 @@ export async function fetchRecommendation(
   const userPrompt = buildUserPrompt(req, profileMeta);
 
   try {
-    const openai = createOpenAI({
-      apiKey,
-      baseURL,
-    });
+    const openai = createOpenAI({ apiKey, baseURL });
 
     const result = await generateText({
-      model: openai.chat(modelName),
+      model: openai.chat(model),
       system: SYSTEM_PROMPT,
       prompt: userPrompt,
       temperature: 0.8,
@@ -97,7 +119,7 @@ export async function fetchRecommendation(
       summary: parsed.data.summary,
       generatedAt: new Date().toISOString(),
       source: "ai",
-      model: modelName,
+      model,
     };
   } catch (aiErr) {
     console.error("[client-recommend] AI call failed, falling back to mock:", aiErr);
@@ -106,7 +128,46 @@ export async function fetchRecommendation(
       ...mock,
       summary: `AI 调用失败（${
         aiErr instanceof Error ? aiErr.message.slice(0, 80) : "unknown"
-      }），已用兜底数据。请检查 API key / baseURL / model 是否匹配。`,
+      }），已用兜底数据。请到 /settings 检查 API 配置。`,
+    };
+  }
+}
+
+export type ConnectionTestResult = {
+  ok: boolean;
+  message: string;
+  latencyMs?: number;
+  reply?: string;
+};
+
+export async function testConnection(): Promise<ConnectionTestResult> {
+  const { apiKey, baseURL, model } = getEffectiveConfig();
+  if (!apiKey || !baseURL) {
+    return { ok: false, message: "API Key 或 baseURL 为空，无法测试。" };
+  }
+  const t0 = Date.now();
+  try {
+    const openai = createOpenAI({ apiKey, baseURL });
+    const result = await generateText({
+      model: openai.chat(model),
+      prompt: "只回复两个字符：ok",
+      temperature: 0,
+      maxRetries: 0,
+    });
+    const latencyMs = Date.now() - t0;
+    const reply = result.text.trim().slice(0, 50);
+    return {
+      ok: true,
+      latencyMs,
+      reply,
+      message: `连接成功 · ${model} · ${latencyMs}ms`,
+    };
+  } catch (e) {
+    const latencyMs = Date.now() - t0;
+    return {
+      ok: false,
+      latencyMs,
+      message: `失败（${latencyMs}ms）：${e instanceof Error ? e.message.slice(0, 120) : "unknown"}`,
     };
   }
 }

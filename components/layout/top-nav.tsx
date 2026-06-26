@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Menu, X, Compass, Sparkles } from "lucide-react";
+import { Menu, X, Compass, Sparkles, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Sheet,
@@ -19,6 +19,7 @@ const NAV_ITEMS = [
   { href: "/memories", label: "人生记录", icon: Sparkles },
   { href: "/budget", label: "资金账本", icon: Compass },
   { href: "/onboarding", label: "AI 引导", icon: Sparkles },
+  { href: "/settings", label: "设置", icon: Settings },
 ];
 
 export function TopNav() {
