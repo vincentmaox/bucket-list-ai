@@ -92,6 +92,14 @@
 - ❌ `useStore((s) => s.data?.items ?? [])` 触发 useSyncExternalStore 警告
 - ✅ 模块级 `const EMPTY: T[] = []` 复用引用
 
+### 3b. Zustand selector 不能返回新对象（第 9 踩雷）
+- ❌ `useStore((s) => s.helper(...))` 当 helper 返回 `{...}` 新对象时
+- ❌ `useStore((s) => ({ a: s.a, b: s.b }))` 每次新对象
+- ❌ `useStore((s) => s.items.filter(...))` 每次新数组
+- ✅ 订阅原始字段 `useStore((s) => s.done)`（引用稳定）
+- ✅ 组件内 `useMemo(() => compute(...), [deps])` 缓存计算结果
+- 详见 `memory/feedback_zustand_selector.md`
+
 ### 4. CountUp + React 严格模式
 - ❌ useRef 防重入（cleanup cancel 第一次 raf）
 - ✅ 纯 useEffect + cleanup，每次 target 变化重启
@@ -138,9 +146,19 @@
 ### 启动
 ```bash
 npm run dev      # http://localhost:3000
-npm run build    # 生产构建
+npm run build    # 生产构建（static export 出 out/）
 npm run lint     # ESLint
 ```
+
+### Tauri 桌面端
+```bash
+npm run tauri dev    # 开发模式，热重载
+npm run tauri build  # 出 portable exe + MSI + NSIS setup
+```
+产物在 `src-tauri/target/release/`：
+- `app.exe` — 12 MB raw（dist/bucket-list-ai-portable.exe 复制自这里）
+- `bundle/msi/*.msi` — 5.7 MB 安装包
+- `bundle/nsis/*-setup.exe` — 4.8 MB NSIS 安装器
 
 ### 添加 shadcn 组件
 ```bash
@@ -156,17 +174,50 @@ npx shadcn@latest add <component-name>
 
 ## 七、AI provider 配置
 
-复制 `.env.example` 为 `.env.local`，填任意 OpenAI 兼容 provider：
+### 两种配置方式（按优先级自动兜底）
+
+#### 方式 1：设置页手动切换（推荐 · `/settings`）
+- 用户在 `/settings` 选择服务商 + 填 Key，存 localStorage
+- 6 家预设：DeepSeek / 豆包 / OpenAI / 通义 / Moonshot / 自定义
+- 切换 provider 自动联动 baseURL/model
+- 「测试连接」按钮 ping 一次 AI 验证配置
+- 数据导出：设置页底部「导出全部 JSON」备份所有 store
+
+#### 方式 2：build 时 env 注入（适用于自测版 portable）
+- `.env.local` 填 `NEXT_PUBLIC_OPENAI_*`（注意前缀，否则 client bundle 拿不到）
+- build 时这些值会被 inline 进 JS bundle（Brotli 压缩嵌入 exe）
+- **安全风险**：分发 exe = 把 key 也送人（解压 PE 资源段可提取）
+- **公发版**：env 留空 build，强制用户在设置页自填
+
+#### Provider 速查表
 
 | Provider | baseURL | Model |
 |---|---|---|
-| 豆包（字节加分） | `https://ark.cn-beijing.volces.com/api/v3` | endpoint id 如 `ep-2024xxxx` |
 | DeepSeek | `https://api.deepseek.com/v1` | `deepseek-chat` |
+| 豆包（字节加分） | `https://ark.cn-beijing.volces.com/api/v3` | endpoint id 如 `ep-2024xxxx` 或 `doubao-pro-32k` |
 | OpenAI | `https://api.openai.com/v1` | `gpt-4o-mini` |
 | 通义 | `https://dashscope.aliyuncs.com/compatible-mode/v1` | `qwen-plus` |
 | Moonshot | `https://api.moonshot.cn/v1` | `moonshot-v1-32k` |
 
+### 三层兜底逻辑（`lib/ai/client.ts` `getEffectiveConfig`）
+
+```
+user store (localStorage) → NEXT_PUBLIC_* env → mock 数据兜底
+```
+
 **未配置时自动 fallback mock 数据**，DEMO 不依赖网络。
+
+### 4 维准备清单 prompt（重要差异化）
+
+每个愿望输出 `preparation` 对象，含 3 维（资金在 estimatedCost 不重复）：
+
+| 维度 | 字段 | 规则 | 反例 |
+|---|---|---|---|
+| 🎯 行为 | `behavior[]` | 动词开头，2-4 条 | ❌「做好准备」「买装备」 |
+| 🧠 能力 | `skill[]` | 名词+技能，1-3 条 | ❌「提升体能」「学摄影」 |
+| 📚 文化 | `culture[]` | 具体作品+关联，1-3 条 | ❌「了解当地文化」「读相关书」 |
+
+正例：`"办申根签证（提前 30 天，需 6 个月银行流水）"` / `"长曝光摄影：f/8, ISO 100, 30s 三脚架"` / `"读《北极神话：冰岛萨迦》（理解极光在北欧神话的地位）"`
 
 ---
 
@@ -248,5 +299,24 @@ JSONL_DIR = Path(r'C:/Users/maoxu/.claude/projects/D--ClaudeCodeProjects-bucket-
 
 - [ ] 更新 `docs/PROJECT_LOG.md`（加 Day N 条目）
 - [ ] 有重大决策/踩坑 → 更新 memory 系统
-- [ ] git commit
-- [ ] 调用 `~/.claude/scripts/save_conversation_turn.py` 存档
+- [ ] git commit + push 到 origin/main
+- [ ] 对话归档（Stop hook 正常时自动；disabled 时手动 python 从 jsonl 提取兜底）
+- [ ] 改了 AI / store / page 逻辑 → 跑 `npm run build` 验证
+- [ ] 改了 UI → 后台 `npm run tauri build` 刷新 `dist/bucket-list-ai-portable.exe`
+- [ ] 重大安全事件（key 泄露等）→ 顶部提醒老茅轮换
+
+## 十三、工具链已知问题（截至 2026-06-27）
+
+### Stop hook disabled
+- `~/.claude/settings.json` 的 Stop hook 被注释，备份在 `.bak-20260625_134356-stop-disabled`
+- 原因：06-24 conversation_log 被莫名清空（疑似 Stop hook 写文件时 bug）
+- 影响：对话无法自动归档，必须手动 python 从 jsonl 提取兜底
+- 修复优先级：P3（不阻塞初赛，但要修）
+
+### portable.exe 嵌入 key
+- 自测版 OK（开箱即用真 AI），但**公发 = 送 key**
+- 公发方案：build 时 `NEXT_PUBLIC_OPENAI_*` 留空，强制用户设置页填
+
+### src-tauri/Cargo.toml CRLF 误判
+- `git diff` 偶尔显示 Cargo.toml 改动（空 diff，只 CRLF warning）
+- commit 前 `git checkout -- src-tauri/Cargo.toml` 还原
