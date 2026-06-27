@@ -1,10 +1,19 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { MapPin, Clock, Wallet, Sparkles, ListChecks, Globe2 } from "lucide-react";
 import { GlassCard } from "@/components/brand";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import type { Wish } from "@/lib/types/wish";
 
@@ -29,6 +38,7 @@ function fitColor(score: number): string {
 
 export function WishCard({ wish }: { wish: Wish }) {
   const router = useRouter();
+  const [prepOpen, setPrepOpen] = useState(false);
   const categoryColor = CATEGORY_COLOR[wish.category] ?? "border-white/20";
 
   function viewOnMap() {
@@ -105,19 +115,41 @@ export function WishCard({ wish }: { wish: Wish }) {
           </Button>
         )}
         {wish.prerequisites && wish.prerequisites.length > 0 && (
-          <details className="group flex-1">
-            <summary className="text-xs text-muted-foreground cursor-pointer hover:text-amber flex items-center gap-1 list-none">
+          <Dialog open={prepOpen} onOpenChange={setPrepOpen}>
+            <DialogTrigger
+              render={
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="glass-panel border-aurora/30 hover:border-aurora/60 hover:text-aurora h-7 text-xs flex-1"
+                />
+              }
+            >
               <ListChecks className="h-3 w-3" />
-              <span>准备 {wish.prerequisites.length}</span>
-            </summary>
-            <ul className="mt-2 space-y-1 pl-4 absolute z-10 glass-panel-strong rounded-lg p-3 max-w-xs">
-              {wish.prerequisites.map((p, i) => (
-                <li key={i} className="text-[11px] text-muted-foreground leading-relaxed">
-                  · {p}
-                </li>
-              ))}
-            </ul>
-          </details>
+              准备 {wish.prerequisites.length}
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle className="font-serif text-lg text-starlight">
+                  准备清单
+                </DialogTitle>
+                <DialogDescription className="text-xs text-muted-foreground">
+                  {wish.title}
+                </DialogDescription>
+              </DialogHeader>
+              <ul className="space-y-2 mt-1">
+                {wish.prerequisites.map((p, i) => (
+                  <li
+                    key={i}
+                    className="text-xs text-muted-foreground flex items-start gap-2 leading-relaxed"
+                  >
+                    <span className="text-aurora mt-0.5 shrink-0">·</span>
+                    <span className="flex-1">{p}</span>
+                  </li>
+                ))}
+              </ul>
+            </DialogContent>
+          </Dialog>
         )}
       </div>
     </GlassCard>
