@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { MapPin, Clock, Wallet, Sparkles, ListChecks, Globe2, ChevronRight } from "lucide-react";
@@ -18,7 +18,11 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import type { Wish } from "@/lib/types/wish";
-import { usePreparationProgressStore, type WishProgress } from "@/lib/store/preparation-progress-store";
+import {
+  usePreparationProgressStore,
+  type PrepDimension,
+  type WishProgress,
+} from "@/lib/store/preparation-progress-store";
 import { PreparationSection } from "./preparation-section";
 
 const CATEGORY_COLOR: Record<string, string> = {
@@ -51,6 +55,30 @@ function countPrepItems(wish: Wish): number {
   return wish.prerequisites?.length ?? 0;
 }
 
+const ZERO_DIM = { done: 0, total: 0, pct: 0 };
+const ZERO_PROGRESS: WishProgress = {
+  behavior: ZERO_DIM,
+  skill: ZERO_DIM,
+  culture: ZERO_DIM,
+  done: 0,
+  total: 0,
+  pct: 0,
+};
+
+function computeDim(
+  done: Record<string, boolean>,
+  wishId: string,
+  dim: PrepDimension,
+  items: string[] | undefined
+) {
+  if (!items?.length) return ZERO_DIM;
+  let d = 0;
+  for (let i = 0; i < items.length; i++) {
+    if (done[`${wishId}.${dim}.${i}`]) d++;
+  }
+  return { done: d, total: items.length, pct: Math.round((d / items.length) * 100) };
+}
+
 export function WishCard({ wish }: { wish: Wish }) {
   const router = useRouter();
   const [prepOpen, setPrepOpen] = useState(false);
@@ -58,10 +86,24 @@ export function WishCard({ wish }: { wish: Wish }) {
   const prepCount = countPrepItems(wish);
   const hasPrep = prepCount > 0;
 
-  // 实时进度（订阅 store 让 Dialog 打开时也更新）
-  const progress = usePreparationProgressStore((s) =>
-    s.getWishProgress(wish.id, wish.preparation)
-  );
+  // 订阅稳定的 done map，useMemo 缓存计算结果（避免 useSyncExternalStore 无限循环）
+  const done = usePreparationProgressStore((s) => s.done);
+  const progress = useMemo<WishProgress>(() => {
+    if (!wish.preparation) return ZERO_PROGRESS;
+    const behavior = computeDim(done, wish.id, "behavior", wish.preparation.behavior);
+    const skill = computeDim(done, wish.id, "skill", wish.preparation.skill);
+    const culture = computeDim(done, wish.id, "culture", wish.preparation.culture);
+    const totalDone = behavior.done + skill.done + culture.done;
+    const total = behavior.total + skill.total + culture.total;
+    return {
+      behavior,
+      skill,
+      culture,
+      done: totalDone,
+      total,
+      pct: total > 0 ? Math.round((totalDone / total) * 100) : 0,
+    };
+  }, [wish.id, wish.preparation, done]);
 
   function viewOnMap() {
     if (wish.location) {
