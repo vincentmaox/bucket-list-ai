@@ -17,6 +17,12 @@ export type WishLocation = {
   lng: number;
 };
 
+export type WishPreparation = {
+  behavior: string[];
+  skill: string[];
+  culture: string[];
+};
+
 export type Wish = {
   id: string;
   title: string;
@@ -33,6 +39,7 @@ export type Wish = {
   timeWindow: string;
   location?: WishLocation;
   prerequisites?: string[];
+  preparation?: WishPreparation;
 };
 
 export type RecommendationRequest = {

@@ -37,6 +37,13 @@ const WISH_SCHEMA = z.object({
     })
     .optional(),
   prerequisites: z.array(z.string()).optional(),
+  preparation: z
+    .object({
+      behavior: z.array(z.string()).min(0).max(4).default([]),
+      skill: z.array(z.string()).min(0).max(3).default([]),
+      culture: z.array(z.string()).min(0).max(3).default([]),
+    })
+    .optional(),
 });
 
 const RESPONSE_SCHEMA = z.object({
